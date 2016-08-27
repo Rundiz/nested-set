@@ -42,12 +42,14 @@ var_dump($result);
 The `$result` must show something that is not null if you install the sql data.
 
 ### Insert, Update the data
+#### Get new position
 You can get new position of the level by use `getNewPosition()` method.
 ```php
 $new_position = $NestedSet->getNewPosition(4);// result is 4.
 ```
 This new position is good for insert new taxonomy item.
 
+#### Insert/Update
 Everytime you insert or update the data, you have to run `rebuild()` method to generate level, left, right data. The incorrect level, left, right data can cause incorrect listing.
 ```php
 $stmt = $PDO->prepare('INSERT INTO `test_taxonomy`(`parent_id`, `name`, `position`) VALUES (?, ?, ?)');
@@ -61,7 +63,8 @@ $stmt->execute(['Root 4 new name', 4, 21]);
 $NestedSet->rebuild();
 ```
 
-Or if you want to change the parent of selected item, you can check first that the new parent of selected item is under children of selected item or not.<br>
+#### Check parent under children
+If you want to change the parent of selected item, you can check first that the new parent of selected item is under children of selected item or not.<br>
 You can use `isParentUnderMyChildren()` method to check this and false means correct parent (new parent is not children of editing item).<br>
 To continue on this please use the data in **taxonomy_unbuild_data.sql** file.
 ```php
@@ -102,7 +105,8 @@ unset($options);
 Both methods parameters are same.
 
 ### Delete an item(s)
-You can choose how to delete an item.<br>
+You can choose how to delete an item.
+
 1. Delete selected item and ALL of its children.
 2. Delete selected item and pull up its children to the current parent.
 
