@@ -46,6 +46,7 @@ class Database
         try {
             $this->PDO = new \PDO($config['dsn'], $config['username'], $config['password'], $config['options']);
             $this->PDO->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
+            $this->PDO->setAttribute(\PDO::ATTR_EMULATE_PREPARES, true);
         } catch (\PDOException $e) {
             throw new \Exception($e->getMessage());
         }
