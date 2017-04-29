@@ -3,7 +3,7 @@
 
 namespace Rundiz\NestedSet\Tests;
 
-class DeleteDataTest extends \PHPUnit_Framework_TestCase
+class DeleteDataTest extends \PHPUnit\Framework\TestCase
 {
 
 

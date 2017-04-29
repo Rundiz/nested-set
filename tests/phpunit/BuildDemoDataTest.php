@@ -3,7 +3,7 @@
 
 namespace Rundiz\NestedSet\Tests;
 
-class BuildDemoDataTest extends \PHPUnit_Framework_TestCase
+class BuildDemoDataTest extends \PHPUnit\Framework\TestCase
 {
 
 

@@ -3,7 +3,7 @@
 
 namespace Rundiz\NestedSet\Tests;
 
-class DBTest extends \PHPUnit_Framework_TestCase
+class DBTest extends \PHPUnit\Framework\TestCase
 {
 
 
