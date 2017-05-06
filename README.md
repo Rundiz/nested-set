@@ -6,7 +6,7 @@ The PHP nested set model for create/read/update/delete the tree data structure (
 [![License](https://poser.pugx.org/rundiz/nested-set/license)](https://packagist.org/packages/rundiz/nested-set)
 [![Total Downloads](https://poser.pugx.org/rundiz/nested-set/downloads)](https://packagist.org/packages/rundiz/nested-set)
 
-![Nested Set] (tests/via-http/nested-set-model.jpg "Nested Set")
+![Nested Set](tests/via-http/nested-set-model.jpg "Nested Set")
 
 ## Example
 
