@@ -1,2 +1,7 @@
 # Disable LF normalization for all files
 * -text
+
+# Export ignore folders, files.
+tests export-ignore
+.gitattributes export-ignore
+phpunit.xml export-ignore
