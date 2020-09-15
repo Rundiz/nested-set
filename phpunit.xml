@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="./tests/phpunit/phpunit.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="true"
+         verbose="true"
+>
+	<testsuites>
+		<testsuite name="All">
+            <!-- have to add each test file here and run with the command `phpunit - -testsuit All` (no space between double dash). -->
+            <file>./tests/phpunit/PhpVersionTest.php</file>
+            <file>./tests/phpunit/DBTest.php</file>
+            <file>./tests/phpunit/CreateDataTest.php</file>
+            <file>./tests/phpunit/ListingDataTest.php</file>
+		</testsuite>
+	</testsuites>
+	<filter>
+		<whitelist>
+			<directory suffix=".php">./src/</directory>
+		</whitelist>
+	</filter>
+</phpunit>
