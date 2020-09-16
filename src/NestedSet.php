@@ -449,7 +449,6 @@ class NestedSet
     /**
      * List taxonomy.
      * 
-     * @todo update the code.
      * @param array $options Available options: <br>
      *                          `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
      *                          `filter_parent_id` (int) The filter parent ID.<br>
@@ -458,6 +457,10 @@ class NestedSet
      *                          `taxonomy_id_in` (array) The taxonomy ID to look with `IN()` MySQL function.<br>
      *                              The array values must be integer, example `array(1,3,4,5)`.<br>
      *                              This will be flatten the result even `list_flatten` was not set.<br>
+     *                          `where` (array) The custom where conditions. The array format is..<br>
+     *                              `array('whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))`<br>
+     *                              or just only `whereString`.<br>
+     *                              `array('whereString' => '(`columnName` = \'value\'))`<br>
      *                          `no_sort_orders` (bool) Set to `true` to do not sort order the result.<br>
      *                          `unlimited` (bool) Set to `true` to do not limit the result.<br>
      *                          `offset` (number) The offset in the query.<br>
@@ -522,6 +525,13 @@ class NestedSet
             }// endforeach;
             unset($array_keys, $column, $key, $last_array_key);
             $sql .= ')';
+        }
+
+        if (
+            isset($options['where']['whereString']) &&
+            is_string($options['where']['whereString'])
+        ) {
+            $sql .= ' AND ' . $options['where']['whereString'];
         }
 
         // group, sort and order
@@ -593,14 +603,17 @@ class NestedSet
     /**
      * Bind taxonomy values for listTaxonomy() method.
      * 
-     * @todo update the code.
      * @internal This method was called from `listTaxonomy()`.
      * @param \PDOStatement $Sth PDO statement class object.
      * @param array $options Available options: <br>
      *                          `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
      *                          `filter_parent_id` (int) The filter parent ID.<br>
      *                          `search` (array) The search array format is..<br>
-     *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`
+     *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`<br>
+     *                          `where` (array) The custom where conditions. The array format is..<br>
+     *                              `array('whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))`<br>
+     *                              or just only `whereString`.<br>
+     *                              `array('whereString' => '(`columnName` = \'value\'))`
      */
     protected function listTaxonomyBindValues(\PDOStatement $Sth, array $options = [])
     {
@@ -613,13 +626,18 @@ class NestedSet
         if (isset($options['search']) && is_array($options['search']) && array_key_exists('searchValue', $options['search'])) {
             $Sth->bindValue(':search', '%'.$options['search']['searchValue'].'%', \PDO::PARAM_STR);
         }
+        if (isset($options['where']['whereValues']) && is_array($options['where']['whereValues'])) {
+            foreach ($options['where']['whereValues'] as $placeholder => $value) {
+                $Sth->bindValue($placeholder, $value);
+            }// endforeach;
+            unset($placeholder, $value);
+        }
     }// listTaxonomyBindValues
 
 
     /**
      * Build tree data with children.
      * 
-     * @todo update the code.
      * @internal This method was called from `listTaxonomy()`.
      * @param array $result The array item get from fetchAll() method using the PDO.
      * @param array $options Available options: <br>
@@ -627,7 +645,7 @@ class NestedSet
      *                          `list_flatten` (bool) Set to `true` to list the result flatten.
      * @return array Return array data of formatted values.
      */
-    protected function listTaxonomyBuildTreeWithChildren(array $result, array $options = [])
+    protected function listTaxonomyBuildTreeWithChildren(array $result, array $options = []): array
     {
         if (isset($options['list_flatten']) && $options['list_flatten'] === true) {
             return $result;
@@ -646,7 +664,7 @@ class NestedSet
                 }
             }// endforeach;
 
-            $result = (isset($items[0]) ? $items[0] : array_shift($items));// this is important ([0]) for prevent duplicate items
+            $result = ($items[0] ?? array_shift($items));// this is important ([0]) for prevent duplicate items
         }
 
         unset($items, $row);
@@ -656,34 +674,51 @@ class NestedSet
 
     /**
      * List taxonomy as flatten not tree.<br>
-     * All parameters or arguments are same as listTaxonomy() method.
+     * All parameters or arguments are same as `listTaxonomy()` method.
      * 
-     * @todo update the code.
-     * @param array $options Available options: taxonomy_id_in, filter_taxonomy_id, filter_parent_id, [search [columns], [search_value]], no_sort_orders, unlimited, offset, limit
+     * @param array $options Available options: <br>
+     *                          `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
+     *                          `filter_parent_id` (int) The filter parent ID.<br>
+     *                          `search` (array) The search array format is..<br>
+     *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`<br>
+     *                          `taxonomy_id_in` (array) The taxonomy ID to look with `IN()` MySQL function.<br>
+     *                              The array values must be integer, example `array(1,3,4,5)`.<br>
+     *                              This will be flatten the result even `list_flatten` was not set.<br>
+     *                          `where` (array) The custom where conditions. The array format is..<br>
+     *                              `array('whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))`<br>
+     *                              or just only `whereString`.<br>
+     *                              `array('whereString' => '(`columnName` = \'value\'))`<br>
+     *                          `no_sort_orders` (bool) Set to `true` to do not sort order the result.<br>
+     *                          `unlimited` (bool) Set to `true` to do not limit the result.<br>
+     *                          `offset` (number) The offset in the query.<br>
+     *                          `limit` (number) The limit number in the query.<br>
+     *                          `list_flatten` (bool) Set to `true` to list the result flatten.
      * @return array Return array with 'total' and 'items' as keys.
      */
-    public function listTaxonomyFlatten(array $options = [])
+    public function listTaxonomyFlatten(array $options = []): array
     {
         $options['list_flatten'] = true;
         $result = $this->listTaxonomy($options);
 
-        if (!is_array($result)) {
-            return $result;
-        } elseif (is_array($result) && (!array_key_exists('total', $result) || !array_key_exists('items', $result))) {
+        if (is_array($result) && (!array_key_exists('total', $result) || !array_key_exists('items', $result))) {
+            if (
+                !array_key_exists('total', $result) && 
+                array_key_exists('items', $result) && 
+                is_array($result['items'])
+            ) {
+                $result['total'] = count($result['items']);
+            } elseif (!array_key_exists('total', $result)) {
+                $result['total'] = 0;
+            }
+
+            if (!array_key_exists('items', $result)) {
+                $result['items'] = [];
+            }
+
             return $result;
         }
 
-        if ($result['total'] <= 0) {
-            return $result;
-        }
-
-        $output = [];
-        $output['total'] = $result['total'];
-        $flat_count = 0;
-        $output['items'] = $result['items'];
-
-        unset($flat_count, $result);
-        return $output;
+        return $result;
     }// listTaxonomyFlatten
 
 
