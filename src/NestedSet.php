@@ -163,23 +163,43 @@ class NestedSet
     /**
      * Get new position for taxonomy in the selected parent.
      * 
-     * @todo update the code.
-     * @param integer $parent_id The parent ID. If root, set this to 0.
-     * @return integer Return the new position in the same parent.
+     * @param int $parent_id The parent ID. If root, set this to 0.
+     * @param array $where Where array structure will be like this.<br>
+     * <pre>
+     * array(
+     *     'whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)',
+     *     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
+     * )</pre>
+     * @return int Return the new position in the same parent.<br>
+     *              WARNING! If there are no results, either because there are no data <br>
+     *              or the results according to the conditions cannot be found. It always returns 1.
      */
-    public function getNewPosition($parent_id)
+    public function getNewPosition(int $parent_id, array $where = []): int
     {
         $sql = 'SELECT `' . $this->idColumnName . '`, `' . $this->parentIdColumnName . '`, `' . $this->positionColumnName . '` FROM `' . $this->tableName . '`';
         $sql .= ' WHERE `' . $this->parentIdColumnName . '` = :parent_id';
+        if (isset($where['whereString']) && is_string($where['whereString'])) {
+            $sql .= ' AND ' . $where['whereString'];
+        }
         $sql .= ' ORDER BY `' . $this->positionColumnName . '` DESC';
-        $stmt = $this->PDO->prepare($sql);
-        $stmt->bindValue(':parent_id', $parent_id, \PDO::PARAM_INT);
-        $stmt->execute();
-        $row = $stmt->fetch();
-        unset($sql, $stmt);
+
+        $Sth = $this->PDO->prepare($sql);
+
+        $Sth->bindValue(':parent_id', $parent_id, \PDO::PARAM_INT);
+        if (isset($where['whereValues']) && is_array($where['whereValues'])) {
+            foreach ($where['whereValues'] as $bindName => $bindValue) {
+                $Sth->bindValue($bindName, $bindValue);
+            }// endforeach;
+            unset($bindName, $bindValue);
+        }
+
+        $Sth->execute();
+        $row = $Sth->fetch();
+        $Sth->closeCursor();
+        unset($sql, $Sth);
 
         if ($row != null) {
-            return ($row->{$this->positionColumnName} + 1);
+            return (int) ($row->{$this->positionColumnName} + 1);
         } else {
             unset($row);
             return 1;

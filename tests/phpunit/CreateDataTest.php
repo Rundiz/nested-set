@@ -1,6 +1,6 @@
 <?php
 /**
- * Test create or insert data process.
+ * Test the processes that should work on create or insert the data.
  */
 
 
@@ -36,7 +36,12 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
         $this->NestedSet = null;
     }
 
-    
+
+    /**
+     * Test import data, these data will be use for another tests.
+     *
+     * @return void
+     */
     public function testImportDemoData()
     {
         if (!file_exists(dirname(__DIR__) . '/common/demo-data.sql')) {
@@ -69,6 +74,49 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
 
 
     /**
+     * Test get new position, the `position` value will be use before `INSERT` the data to DB.
+     *
+     * @return void
+     */
+    public function testGetNewPosition()
+    {
+        // test_taxonomy table. ---------------------------------
+        $this->NestedSet->tableName = 'test_taxonomy';
+        $newPosition = $this->NestedSet->getNewPosition(4);
+        $this->assertEquals(4, $newPosition);
+        $newPosition = $this->NestedSet->getNewPosition(2);
+        $this->assertEquals(6, $newPosition);
+
+        // test_taxonomy2 table. ---------------------------------
+        $this->NestedSet->tableName = 'test_taxonomy2';
+        $this->NestedSet->idColumnName = 'tid';
+        $this->NestedSet->leftColumnName = 't_left';
+        $this->NestedSet->rightColumnName = 't_right';
+        $this->NestedSet->levelColumnName = 't_level';
+        $this->NestedSet->positionColumnName = 't_position';
+        $newPosition = $this->NestedSet->getNewPosition(4, [
+            'whereString' => 't_type = :t_type',
+            'whereValues' => [':t_type' => 'category'],
+        ]);
+        $this->assertEquals(4, $newPosition);
+        $newPosition = $this->NestedSet->getNewPosition(16, [
+            'whereString' => 't_type = :t_type',
+            'whereValues' => [':t_type' => 'category'],
+        ]);
+        $this->assertEquals(4, $newPosition);
+        $newPosition = $this->NestedSet->getNewPosition(21, [
+            'whereString' => 't_type = :t_type',
+            'whereValues' => [':t_type' => 'product-category'],
+        ]);
+        $this->assertEquals(5, $newPosition);
+    }// testGetNewPosition
+
+
+    /**
+     * Test get the data tree. This is usually for retrieve all the data with less condition.
+     * 
+     * The `getTreeWithChildren()` method will be called automatically while run the `rebuild()` method.
+     * 
      * @depends testImportDemoData
      */
     public function testGetTreeWithChildren()
@@ -104,6 +152,13 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
     }// testGetTreeWithChildren
 
 
+    /**
+     * Test rebuild `children` into the array result.
+     * 
+     * The `getTreeRebuildChildren()` method will be called automatically while run the `getTreeWithChildren()` method.
+     *
+     * @return void
+     */
     public function testGetTreeRebuildChildren()
     {
         $root = new \stdClass();
@@ -190,6 +245,10 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
 
 
     /**
+     * Test rebuild `level`, `left`, `right` data.
+     * 
+     * This `rebuildGenerateTreeData()` method will be called automatically while run the `rebuild()` method.
+     * 
      * @depends testImportDemoData
      */
     public function testRebuildGenerateTreeData()
@@ -368,6 +427,12 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
     }// testRebuildGenerateTreeData
 
 
+    /**
+     * Test `rebuild()` method. This method must run after `INSERT` or `UPDATE` the database.<br>
+     * It may have to run if the `level`, `left`, `right` data is incorrect.
+     *
+     * @return void
+     */
     public function testRebuild()
     {
         $this->NestedSet->tableName = 'test_taxonomy';

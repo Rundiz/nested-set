@@ -7,6 +7,11 @@ class DBTest extends \PHPUnit\Framework\TestCase
 {
 
 
+    /**
+     * Test that DB configurations are configured correctly.
+     *
+     * @return void
+     */
     public function testDbConfig()
     {
         $PDO = require dirname(__DIR__) . '/common/pdo-connect.php';
@@ -19,6 +24,8 @@ class DBTest extends \PHPUnit\Framework\TestCase
 
 
     /**
+     * Test that the tables (DB structure) are created or imported correctly.
+     * 
      * @depends testDbConfig
      */
     public function testTablesInstalled(\PDO $PDO)

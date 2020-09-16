@@ -37,6 +37,11 @@ class ListingDataTest extends \PHPUnit\Framework\TestCase
     }
 
 
+    /**
+     * Test listing the taxonomy data in hierarchy or flatten styles with many options.
+     *
+     * @return void
+     */
     public function testListTaxonomy()
     {
         // tests on `test_taxonomy` table. ----------------------------------------------
@@ -176,6 +181,11 @@ class ListingDataTest extends \PHPUnit\Framework\TestCase
     }// testListTaxonomyExpectChildren
 
 
+    /**
+     * Test listing the taxonomy data in flatten style.
+     *
+     * @return void
+     */
     public function testListTaxonomyFlatten()
     {
         // tests on `test_taxonomy` table. ----------------------------------------------

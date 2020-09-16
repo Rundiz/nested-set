@@ -17,6 +17,7 @@
             <file>./tests/phpunit/DBTest.php</file>
             <file>./tests/phpunit/CreateDataTest.php</file>
             <file>./tests/phpunit/ListingDataTest.php</file>
+            <file>./tests/phpunit/ReadDataTest.php</file>
 		</testsuite>
 	</testsuites>
 	<filter>
