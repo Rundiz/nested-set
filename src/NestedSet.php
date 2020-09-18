@@ -514,7 +514,12 @@ class NestedSet
         }
 
         // check for selected parent that must not under this taxonomy.
-        $taxonomy_parents = $this->getTaxonomyWithParents(['filter_taxonomy_id' => $parent_id]);
+        $options = [];
+        $options['filter_taxonomy_id'] = $parent_id;
+        if (isset($where['whereString'])) {
+            $options['where'] = $where;
+        }
+        $taxonomy_parents = $this->getTaxonomyWithParents($options);
 
         if (is_array($taxonomy_parents) && !empty($taxonomy_parents)) {
             foreach ($taxonomy_parents as $row) {
