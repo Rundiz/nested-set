@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Nested Set
- * @version 1.0.0-a
+ * @version 1.0.0
  * @author Vee W.
  * @license http://opensource.org/licenses/MIT MIT
  */
