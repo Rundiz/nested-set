@@ -21,7 +21,7 @@ INSERT IGNORE INTO `test_taxonomy` (`id`, `parent_id`, `name`, `position`, `leve
 (17, 3, '3.3', 3, 0, 0, 0),
 (18, 16, '3.2.1', 1, 0, 0, 0),
 (19, 16, '3.2.2', 2, 0, 0, 0),
-(20, 16, '3.3.3', 3, 0, 0, 0);
+(20, 16, '3.2.3', 3, 0, 0, 0);
 
 
 INSERT IGNORE INTO `test_taxonomy2` (`tid`, `parent_id`, `t_type`, `t_name`, `t_status`, `t_position`, `t_level`, `t_left`, `t_right`) VALUES
@@ -44,7 +44,7 @@ INSERT IGNORE INTO `test_taxonomy2` (`tid`, `parent_id`, `t_type`, `t_name`, `t_
 (17, 3, 'category', '3.3', 1, 3, 0, 0, 0),
 (18, 16, 'category', '3.2.1', 1, 1, 0, 0, 0),
 (19, 16, 'category', '3.2.2', 1, 2, 0, 0, 0),
-(20, 16, 'category', '3.3.3', 0, 3, 0, 0, 0),
+(20, 16, 'category', '3.2.3', 0, 3, 0, 0, 0),
 (21, 0, 'product-category', 'Camera', 1, 1, 0, 0, 0),
 (22, 0, 'product-category', 'Computer', 1, 2, 0, 0, 0),
 (23, 0, 'product-category', 'Electronic', 1, 3, 0, 0, 0),

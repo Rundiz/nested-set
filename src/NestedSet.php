@@ -54,6 +54,7 @@ class NestedSet
     public $tableName = 'taxonomy';
 
     /**
+     * @since 1.0
      * @var \PDO The PDO class instance.
      */
     protected $PDO;
@@ -75,7 +76,7 @@ class NestedSet
      * Example: selected taxonomy ID is 4, its parent ID is 2. This method will be pull all children that has parent ID = 4 to 2 and delete the taxonomy ID 4.<br>
      * Always run <code>$NestedSet->rebuild()</code> after insert, update, delete to rebuild the correctly level, left, right data.
      * 
-     * @todo update the code.
+     * @todo update the code `deletePullUpChildren`.
      * @param integer $taxonomy_id The selected taxonomy ID.
      * @return boolean Return true on success, false for otherwise.
      */
@@ -122,7 +123,7 @@ class NestedSet
      * Delete the selected taxonomy ID with its ALL children.<br>
      * Always run <code>$NestedSet->rebuild()</code> after insert, update, delete to rebuild the correctly level, left, right data.
      * 
-     * @todo update the code.
+     * @todo update the code `deleteWithChildren`.
      * @param integer $taxonomy_id The taxonomy ID to delete.
      * @return mixed Return number on success, return false for otherwise.
      */
@@ -210,14 +211,39 @@ class NestedSet
     /**
      * Get taxonomy from selected item and fetch its ALL children.<br>
      * Example: There are taxonomy tree like this. Root 1 > 1.1 > 1.1.1, Root 2, Root 3 > 3.1, Root 3 > 3.2 > 3.2.1, Root 3 > 3.2 > 3.2.2, Root 3 > 3.3<br>
-     * Assume that selected item is Root 3. So, the result will be Root 3 > 3.1, Root 3 > 3.2 > 3.2.1, Root 3 > 3.2 > 3.2.2, Root 3 > 3.3<br>
+     * Assume that selected item is Root 3. So, the result will be Root 3 > 3.1, 3.2 > 3.2.1, 3.2.2, 3.3<br>
      * 
-     * @todo update the code.
+     * Warning! Even this method has options for search, custom where conditions
+     * but it is recommended that you should set the option to select only specific item.<br>
+     * This method is intended to show results from a single target.
+     * 
+     * The columns `left`, `right` must have been built before using this method, otherwise the result will be incorrect.
+     * 
      * @param array $options Available options: filter_taxonomy_id, [search [columns], [search_value]], unlimited, offset, limit
+     * @param array $options Available options: <br>
+     *                          `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
+     *                          `search` (array) The search array format is..<br>
+     *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`<br>
+     *                          `where` (array) The custom where conditions. The array format is..<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
+     *                              or just only `whereString`.<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = \'value\'))``<br>
+     *                          `unlimited` (bool) Set to `true` to do not limit the result.<br>
+     *                          `offset` (number) The offset in the query.<br>
+     *                          `limit` (number) The limit number in the query.<br>
+     *                          
      * @return mixed Return array object of taxonomy data if found, return null if not found.
      */
     public function getTaxonomyWithChildren(array $options = [])
     {
+        // remove unwanted options that is available in `listTaxonomy()` method.
+        unset(
+            $options['filter_parent_id'], 
+            $options['taxonomy_id_in'], 
+            $options['no_sort_orders'], 
+            $options['list_flatten']
+        );
+        // set required option.
         $options['list_flatten'] = true;
         $result = $this->listTaxonomy($options);
 
@@ -232,31 +258,47 @@ class NestedSet
     /**
      * Get taxonomy from selected item and fetch its parent in a line until root item.<br>
      * Example: There are taxonomy tree like this. Root1 > 1.1 > 1.1.1 > 1.1.1.1<br>
-     * Assume that selected at 1.1.1. So, the result will be Root1 > 1.1 > 1.1.1<br>
-     * But if you set 'skip_current' to true the result will be Root1 > 1.1
+     * Assume that you selected at 1.1.1. So, the result will be Root1 > 1.1 > 1.1.1<br>
+     * But if you set 'skipCurrent' to true the result will be Root1 > 1.1
      * 
-     * @todo update the code.
+     * Warning! Even this method has options for search, custom where conditions
+     * but it is recommended that you should set the option to select only specific item.<br>
+     * This method is intended to show results from a single target.
+     * 
+     * The columns `left`, `right` must have been built before using this method, otherwise the result will be incorrect.
+     * 
      * @link http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/ Original source.
-     * @param array $options Available options: taxonomy_id, [search [columns], [search_value]], skip_current
+     * @param array $options Available options: <br>
+     *                      `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
+     *                      `search` (array) The search array format is..<br>
+     *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`<br>
+     *                      `where` (array) The custom where conditions. The array format is..<br>
+     *                              ``array('whereString' => '(`node`.`columnName` = :value1 AND `node`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
+     *                              or just only `whereString`.<br>
+     *                              ``array('whereString' => '(`node`.`columnName` = \'value\'))``<br>
+     *                      `skipCurrent` (bool) Set to `true` to skip currently selected item.
      * @return mixed Return array object of taxonomy data if found, return null if not found.
      */
-    public function getTaxonomyWithParents(array $options = [])
+    public function getTaxonomyWithParents(array $options = []): array
     {
         $sql = 'SELECT `parent`.*';
         $sql .= ' FROM `' . $this->tableName . '` AS `node`,';
         $sql .= ' `' . $this->tableName . '` AS `parent`';
         $sql .= ' WHERE';
         $sql .= ' `node`.`' . $this->leftColumnName . '` BETWEEN `parent`.`' . $this->leftColumnName . '` AND `parent`.`' . $this->rightColumnName . '`';
-        if (isset($options['taxonomy_id'])) {
-            $sql .= ' AND `node`.`' . $this->idColumnName . '` = :taxonomy_id';
+
+        if (isset($options['filter_taxonomy_id'])) {
+            $sql .= ' AND `node`.`' . $this->idColumnName . '` = :filter_taxonomy_id';
         }
+
         if (
             isset($options['search']) && 
             is_array($options['search']) && 
             array_key_exists('columns', $options['search']) && 
             is_array($options['search']['columns']) && 
-            array_key_exists('search_value', $options['search'])
+            array_key_exists('searchValue', $options['search'])
         ) {
+            $haveSearch = true;
             $sql .= ' AND (';
             $array_keys = array_keys($options['search']['columns']);
             $last_array_key = array_pop($array_keys);
@@ -269,22 +311,38 @@ class NestedSet
             unset($array_keys, $column, $key, $last_array_key);
             $sql .= ')';
         }
+
+        if (
+            isset($options['where']['whereString']) &&
+            is_string($options['where']['whereString'])
+        ) {
+            $sql .= ' AND ' . $options['where']['whereString'];
+        }
+
+        $sql .= ' GROUP BY `parent`.`' . $this->idColumnName . '`';
         $sql .= ' ORDER BY `parent`.`' . $this->leftColumnName . '`';
 
-        $stmt = $this->PDO->prepare($sql);
-        if (isset($options['taxonomy_id'])) {
-            $stmt->bindValue(':taxonomy_id', $options['taxonomy_id'], \PDO::PARAM_INT);
+        $Sth = $this->PDO->prepare($sql);
+        if (isset($options['filter_taxonomy_id'])) {
+            $Sth->bindValue(':filter_taxonomy_id', $options['filter_taxonomy_id'], \PDO::PARAM_INT);
         }
-        if (isset($options['search']) && is_array($options['search']) && array_key_exists('search_value', $options['search'])) {
-            $stmt->bindValue(':search', '%'.$options['search']['search_value'].'%', \PDO::PARAM_STR);
+        if (isset($options['search']) && is_array($options['search']) && array_key_exists('searchValue', $options['search'])) {
+            $Sth->bindValue(':search', '%'.$options['search']['searchValue'].'%', \PDO::PARAM_STR);
         }
-        $stmt->execute();
-        $result = $stmt->fetchAll();
+        if (isset($options['where']['whereValues']) && is_array($options['where']['whereValues'])) {
+            foreach ($options['where']['whereValues'] as $placeholder => $value) {
+                $Sth->bindValue($placeholder, $value);
+            }// endforeach;
+            unset($placeholder, $value);
+        }
+        $Sth->execute();
+        $result = $Sth->fetchAll();
+        $Sth->closeCursor();
 
-        if (isset($options['skip_current']) && $options['skip_current'] === true) {
+        if (isset($options['skipCurrent']) && $options['skipCurrent'] === true) {
             unset($result[count($result)-1]);
         }
-        unset($sql, $stmt);
+        unset($haveSearch, $sql, $Sth);
 
         if ($result !== false && $result !== null) {
             return $result;
@@ -378,6 +436,7 @@ class NestedSet
      * 
      * Usually, this method is for get taxonomy tree data in the array format that suit for loop/nest loop verify level.
      * 
+     * @since 1.0
      * @internal This method was called from `rebuild()`.
      * @param array $where Where array structure will be like this.<br>
      * <pre>
@@ -435,12 +494,19 @@ class NestedSet
      * Assume that you editing 1.1.1 and its parent is 1.1. Now you change its parent to 1.1.1.1.1 which is under its children.<br>
      * The parent of 1.1.1 must be root, Root 1, 1.1 and never go under that.
      * 
-     * @todo update the code.
-     * @param integer $taxonomy_id The taxonomy ID that is chaging the parent.
-     * @param integer $parent_id The selected parent ID to check.
-     * @return boolean Return true if its parent is under its children (incorrect changes). Return false if its parent is NOT under its children (correct changes).
+     * @param int $taxonomy_id The taxonomy ID that is chaging the parent.
+     * @param int $parent_id The selected parent ID to check.
+     * @param array $where Where array structure will be like this.<br>
+     * <pre>
+     * array(
+     *     'whereString' => '(`node`.`columnName` = :value1 AND `node`.`columnName2` = :value2)',
+     *     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
+     * )</pre>
+     * @return bool Return `true` if its parent is under its children (INCORRECT changes).<br>
+     *                      Return `true` if search result was not found (INCORRECT changes).<br>
+     *                      Return `false` if its parent is not under its children (CORRECT changes).
      */
-    public function isParentUnderMyChildren($taxonomy_id, $parent_id)
+    public function isParentUnderMyChildren(int $taxonomy_id, int $parent_id, array $where = []): bool
     {
         if ($parent_id == '0') {
             // if parent is root, always return false because it is correctly!
@@ -448,7 +514,7 @@ class NestedSet
         }
 
         // check for selected parent that must not under this taxonomy.
-        $taxonomy_parents = $this->getTaxonomyWithParents(['taxonomy_id' => $parent_id]);
+        $taxonomy_parents = $this->getTaxonomyWithParents(['filter_taxonomy_id' => $parent_id]);
 
         if (is_array($taxonomy_parents) && !empty($taxonomy_parents)) {
             foreach ($taxonomy_parents as $row) {
@@ -469,6 +535,8 @@ class NestedSet
     /**
      * List taxonomy.
      * 
+     * The columns `left`, `right` must have been built before using this method, otherwise the result will be incorrect.
+     * 
      * @param array $options Available options: <br>
      *                          `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
      *                          `filter_parent_id` (int) The filter parent ID.<br>
@@ -478,9 +546,9 @@ class NestedSet
      *                              The array values must be integer, example `array(1,3,4,5)`.<br>
      *                              This will be flatten the result even `list_flatten` was not set.<br>
      *                          `where` (array) The custom where conditions. The array format is..<br>
-     *                              `array('whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))`<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
      *                              or just only `whereString`.<br>
-     *                              `array('whereString' => '(`columnName` = \'value\'))`<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = \'value\'))``<br>
      *                          `no_sort_orders` (bool) Set to `true` to do not sort order the result.<br>
      *                          `unlimited` (bool) Set to `true` to do not limit the result.<br>
      *                          `offset` (number) The offset in the query.<br>
@@ -631,9 +699,9 @@ class NestedSet
      *                          `search` (array) The search array format is..<br>
      *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`<br>
      *                          `where` (array) The custom where conditions. The array format is..<br>
-     *                              `array('whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))`<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
      *                              or just only `whereString`.<br>
-     *                              `array('whereString' => '(`columnName` = \'value\'))`
+     *                              ``array('whereString' => '(`parent`.`columnName` = \'value\'))``
      */
     protected function listTaxonomyBindValues(\PDOStatement $Sth, array $options = [])
     {
@@ -705,9 +773,9 @@ class NestedSet
      *                              The array values must be integer, example `array(1,3,4,5)`.<br>
      *                              This will be flatten the result even `list_flatten` was not set.<br>
      *                          `where` (array) The custom where conditions. The array format is..<br>
-     *                              `array('whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))`<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
      *                              or just only `whereString`.<br>
-     *                              `array('whereString' => '(`columnName` = \'value\'))`<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = \'value\'))``<br>
      *                          `no_sort_orders` (bool) Set to `true` to do not sort order the result.<br>
      *                          `unlimited` (bool) Set to `true` to do not limit the result.<br>
      *                          `offset` (number) The offset in the query.<br>
@@ -745,6 +813,8 @@ class NestedSet
     /**
      * Rebuilds the tree data and save it to the database.<br>
      * This will be rebuild the level, left, right values.
+     * 
+     * The columns `left`, `right` must have been built before using this method, otherwise the result will be incorrect.
      * 
      * @param array $where Where array structure will be like this.<br>
      * <pre>
