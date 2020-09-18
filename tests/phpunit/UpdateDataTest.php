@@ -62,44 +62,46 @@ class UpdateDataTest extends \PHPUnit\Framework\TestCase
         $this->NestedSet->levelColumnName = 't_level';
         $this->NestedSet->positionColumnName = 't_position';
         $this->assertTrue($this->NestedSet->isParentUnderMyChildren(
-            9, 
-            12, 
+            9, // 2.1.1 (9)
+            12, // shouldn't under 2.1.1.1 (12)
             [
-                'where' => [
-                    'whereConditions' => '`node`.t_type` = :t_type',
-                    'whereValues' => [':t_type' => 'category'],
-                ]
+                'whereString' => '`node`.`t_type` = :t_type',
+                'whereValues' => [':t_type' => 'category'],
             ]
         ));
         $this->assertFalse($this->NestedSet->isParentUnderMyChildren(
-            19, 
-            16, 
+            9, // 2.1.1 (9)
+            20, // is okay to be under 3.2.3 (20 - will be new parent)
             [
-                'where' => [
-                    'whereConditions' => '`node`.t_type` = :t_type',
-                    'whereValues' => [':t_type' => 'category'],
-                ]
+                'whereString' => '`node`.`t_type` = :t_type',
+                'whereValues' => [':t_type' => 'category'],
+            ]
+        ));
+
+        $this->assertFalse($this->NestedSet->isParentUnderMyChildren(
+            19, // 3.2.2
+            16, // is under 3.2
+            [
+                'whereString' => '`node`.`t_type` = :t_type',
+                'whereValues' => [':t_type' => 'category'],
             ]
         ));
         // test search not found because incorrect `t_type` (must be return `true`).
         $this->assertTrue($this->NestedSet->isParentUnderMyChildren(
-            21, 
-            25, 
+            19, 
+            16, 
             [
-                'where' => [
-                    'whereConditions' => '`node`.t_type` = :t_type',
-                    'whereValues' => [':t_type' => 'category'],
-                ]
+                'whereString' => '`node`.`t_type` = :t_type',
+                'whereValues' => [':t_type' => 'product-category'],
             ]
         ));
+
         $this->assertTrue($this->NestedSet->isParentUnderMyChildren(
-            21, 
-            25, 
+            21, // camera (21)
+            25, // shouldn't under nikon (25)
             [
-                'where' => [
-                    'whereConditions' => '`node`.t_type` = :t_type',
-                    'whereValues' => [':t_type' => 'product-category'],
-                ]
+                'whereString' => '`node`.`t_type` = :t_type',
+                'whereValues' => [':t_type' => 'product-category'],
             ]
         ));
         // test multiple level children.
@@ -107,10 +109,8 @@ class UpdateDataTest extends \PHPUnit\Framework\TestCase
             30, // dell
             22, // is under desktop (28) > and desktop is under computer (22)
             [
-                'where' => [
-                    'whereConditions' => '`node`.t_type` = :t_type',
-                    'whereValues' => [':t_type' => 'product-category'],
-                ]
+                'whereString' => '`node`.`t_type` = :t_type',
+                'whereValues' => [':t_type' => 'product-category'],
             ]
         ));
     }// testIsParentUnderMyChildren
