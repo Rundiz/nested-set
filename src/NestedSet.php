@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Nested Set
- * @version 1.0.0
+ * @version 1.0.1
  * @author Vee W.
  * @license http://opensource.org/licenses/MIT MIT
  */
@@ -80,7 +80,7 @@ class NestedSet
      * @param array $where Where array structure will be like this.<br>
      * <pre>
      * array(
-     *     'whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)',
+     *     'whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)',
      *     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
      * )</pre>
      * @return boolean Return true on success, false for otherwise.
@@ -91,7 +91,6 @@ class NestedSet
         $sql = 'SELECT `' . $this->idColumnName . '`, `' . $this->parentIdColumnName . '` FROM `' . $this->tableName . '`';
         $sql .= ' WHERE `' . $this->idColumnName . '` = :taxonomy_id';
         if (isset($where['whereString']) && is_string($where['whereString'])) {
-            $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
             $sql .= ' AND ' . $where['whereString'];
         }
         $Sth = $this->PDO->prepare($sql);
@@ -118,7 +117,6 @@ class NestedSet
         $sql .= ' SET `' . $this->parentIdColumnName . '` = :parent_id';
         $sql .= ' WHERE `' . $this->parentIdColumnName . '` = :taxonomy_id';
         if (isset($where['whereString']) && is_string($where['whereString'])) {
-            $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
             $sql .= ' AND ' . $where['whereString'];
         }
         $Sth = $this->PDO->prepare($sql);
@@ -138,7 +136,6 @@ class NestedSet
         // delete the selected taxonomy ID
         $sql = 'DELETE FROM `' . $this->tableName . '` WHERE `' . $this->idColumnName . '` = :taxonomy_id';
         if (isset($where['whereString']) && is_string($where['whereString'])) {
-            $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
             $sql .= ' AND ' . $where['whereString'];
         }
         $Sth = $this->PDO->prepare($sql);
@@ -165,6 +162,7 @@ class NestedSet
      * 
      * @param int $taxonomy_id The taxonomy ID to delete.
      * @param array $where Where array structure will be like this.<br>
+     *                      `parent` or `child` is required if there are ambugious error.
      * <pre>
      * array(
      *     'whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)',

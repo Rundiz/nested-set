@@ -144,28 +144,28 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-393726146"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-363686061"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-393726146" class="accordion-body collapse in">
+            <div id="namespace-363686061" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1069934776"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2104605486"></a>
                                 <a href="../namespaces/Rundiz.html" style="margin-left: 30px; padding-left: 0">Rundiz</a>
             </div>
-            <div id="namespace-1069934776" class="accordion-body collapse ">
+            <div id="namespace-2104605486" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1331128947"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2025005609"></a>
                                 <a href="../namespaces/Rundiz.NestedSet.html" style="margin-left: 30px; padding-left: 0">NestedSet</a>
             </div>
-            <div id="namespace-1331128947" class="accordion-body collapse ">
+            <div id="namespace-2025005609" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -581,7 +581,7 @@ Always run &lt;code&gt;$NestedSet-&gt;rebuild()&lt;/code&gt; after insert, updat
                                 <td><p>Where array structure will be like this.<br></p>
 <pre>
 array(
-    'whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)',
+    'whereString' => '(`columnName` = :value1 AND `columnName2` = :value2)',
     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
 )</pre></td>
                             </tr>
@@ -628,7 +628,8 @@ Always run &lt;code&gt;$NestedSet-&gt;rebuild()&lt;/code&gt; after insert, updat
                                                     <tr>
                                 <td>array</td>
                                 <td>$where </td>
-                                <td><p>Where array structure will be like this.<br></p>
+                                <td><p>Where array structure will be like this.<br>
+<code>parent</code> or <code>child</code> is required if there are ambugious error.</p>
 <pre>
 array(
     'whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)',
@@ -1113,7 +1114,7 @@ array(
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on September 18th, 2020 at 20:46.
+                    on September 18th, 2020 at 23:46.
                 </section>
             </section>
         </section>
