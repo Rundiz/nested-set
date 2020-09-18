@@ -76,22 +76,38 @@ class NestedSet
      * Example: selected taxonomy ID is 4, its parent ID is 2. This method will be pull all children that has parent ID = 4 to 2 and delete the taxonomy ID 4.<br>
      * Always run <code>$NestedSet->rebuild()</code> after insert, update, delete to rebuild the correctly level, left, right data.
      * 
-     * @todo update the code `deletePullUpChildren`.
-     * @param integer $taxonomy_id The selected taxonomy ID.
+     * @param int $taxonomy_id The selected taxonomy ID.
+     * @param array $where Where array structure will be like this.<br>
+     * <pre>
+     * array(
+     *     'whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)',
+     *     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
+     * )</pre>
      * @return boolean Return true on success, false for otherwise.
      */
-    public function deletePullUpChildren($taxonomy_id)
+    public function deletePullUpChildren(int $taxonomy_id, array $where = []): bool
     {
         // get this taxonomy parent id
         $sql = 'SELECT `' . $this->idColumnName . '`, `' . $this->parentIdColumnName . '` FROM `' . $this->tableName . '`';
         $sql .= ' WHERE `' . $this->idColumnName . '` = :taxonomy_id';
-        $stmt = $this->PDO->prepare($sql);
+        if (isset($where['whereString']) && is_string($where['whereString'])) {
+            $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
+            $sql .= ' AND ' . $where['whereString'];
+        }
+        $Sth = $this->PDO->prepare($sql);
         unset($sql);
-        $stmt->bindValue(':taxonomy_id', $taxonomy_id, \PDO::PARAM_INT);
-        $stmt->execute();
-        $row = $stmt->fetch();
+        $Sth->bindValue(':taxonomy_id', $taxonomy_id, \PDO::PARAM_INT);
+        if (isset($where['whereValues']) && is_array($where['whereValues'])) {
+            foreach ($where['whereValues'] as $bindName => $bindValue) {
+                $Sth->bindValue($bindName, $bindValue);
+            }// endforeach;
+            unset($bindName, $bindValue);
+        }
+        $Sth->execute();
+        $row = $Sth->fetch();
         $parent_id = $row->{$this->parentIdColumnName};
-        unset($row, $stmt);
+        $Sth->closeCursor();
+        unset($row, $Sth);
 
         if ($parent_id == null) {
             $parent_id = 0;
@@ -101,19 +117,41 @@ class NestedSet
         $sql = 'UPDATE `' . $this->tableName . '`';
         $sql .= ' SET `' . $this->parentIdColumnName . '` = :parent_id';
         $sql .= ' WHERE `' . $this->parentIdColumnName . '` = :taxonomy_id';
-        $stmt = $this->PDO->prepare($sql);
+        if (isset($where['whereString']) && is_string($where['whereString'])) {
+            $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
+            $sql .= ' AND ' . $where['whereString'];
+        }
+        $Sth = $this->PDO->prepare($sql);
         unset($sql);
-        $stmt->bindValue(':parent_id', $parent_id, \PDO::PARAM_INT);
-        $stmt->bindValue(':taxonomy_id', $taxonomy_id, \PDO::PARAM_INT);
-        $stmt->execute();
-        unset($stmt);
+        $Sth->bindValue(':parent_id', $parent_id, \PDO::PARAM_INT);
+        $Sth->bindValue(':taxonomy_id', $taxonomy_id, \PDO::PARAM_INT);
+        if (isset($where['whereValues']) && is_array($where['whereValues'])) {
+            foreach ($where['whereValues'] as $bindName => $bindValue) {
+                $Sth->bindValue($bindName, $bindValue);
+            }// endforeach;
+            unset($bindName, $bindValue);
+        }
+        $Sth->execute();
+        $Sth->closeCursor();
+        unset($Sth);
 
         // delete the selected taxonomy ID
         $sql = 'DELETE FROM `' . $this->tableName . '` WHERE `' . $this->idColumnName . '` = :taxonomy_id';
-        $stmt = $this->PDO->prepare($sql);
-        $stmt->bindValue(':taxonomy_id', $taxonomy_id, \PDO::PARAM_INT);
-        $result = $stmt->execute();
-        unset($sql, $stmt);
+        if (isset($where['whereString']) && is_string($where['whereString'])) {
+            $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
+            $sql .= ' AND ' . $where['whereString'];
+        }
+        $Sth = $this->PDO->prepare($sql);
+        $Sth->bindValue(':taxonomy_id', $taxonomy_id, \PDO::PARAM_INT);
+        if (isset($where['whereValues']) && is_array($where['whereValues'])) {
+            foreach ($where['whereValues'] as $bindName => $bindValue) {
+                $Sth->bindValue($bindName, $bindValue);
+            }// endforeach;
+            unset($bindName, $bindValue);
+        }
+        $result = $Sth->execute();
+        $Sth->closeCursor();
+        unset($sql, $Sth);
 
         return $result;
     }// deletePullUpChildren
@@ -123,15 +161,25 @@ class NestedSet
      * Delete the selected taxonomy ID with its ALL children.<br>
      * Always run <code>$NestedSet->rebuild()</code> after insert, update, delete to rebuild the correctly level, left, right data.
      * 
-     * @todo update the code `deleteWithChildren`.
-     * @param integer $taxonomy_id The taxonomy ID to delete.
+     * The columns `left`, `right` must have been built before using this method, otherwise the result will be incorrect.
+     * 
+     * @param int $taxonomy_id The taxonomy ID to delete.
+     * @param array $where Where array structure will be like this.<br>
+     * <pre>
+     * array(
+     *     'whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)',
+     *     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
+     * )</pre>
      * @return mixed Return number on success, return false for otherwise.
      */
-    public function deleteWithChildren($taxonomy_id)
+    public function deleteWithChildren(int $taxonomy_id, array $where = [])
     {
         $options = [];
         $options['filter_taxonomy_id'] = $taxonomy_id;
         $options['unlimited'] = true;
+        if (isset($where['whereString'])) {
+            $options['where'] = $where;
+        }
         $result = $this->getTaxonomyWithChildren($options);
         $i_count = 0;
         unset($options);
@@ -139,10 +187,23 @@ class NestedSet
         if (is_array($result)) {
             foreach ($result as $row) {
                 $sql = 'DELETE FROM `' . $this->tableName . '` WHERE `' . $this->idColumnName . '` = :taxonomy_id';
-                $stmt = $this->PDO->prepare($sql);
-                $stmt->bindValue(':taxonomy_id', $row->{$this->idColumnName}, \PDO::PARAM_INT);
-                $execute = $stmt->execute();
-                unset($sql, $stmt);
+                if (isset($where['whereString']) && is_string($where['whereString'])) {
+                    $where['whereString'] = str_replace(['`parent`.', '`child`.'], '', $where['whereString']);
+                    $sql .= ' AND ' . $where['whereString'];
+                }
+                $Sth = $this->PDO->prepare($sql);
+
+                $Sth->bindValue(':taxonomy_id', $row->{$this->idColumnName}, \PDO::PARAM_INT);
+                if (isset($where['whereValues']) && is_array($where['whereValues'])) {
+                    foreach ($where['whereValues'] as $bindName => $bindValue) {
+                        $Sth->bindValue($bindName, $bindValue);
+                    }// endforeach;
+                    unset($bindName, $bindValue);
+                }
+
+                $execute = $Sth->execute();
+                $Sth->closeCursor();
+                unset($sql, $Sth);
 
                 if ($execute === true) {
                     $i_count++;
@@ -219,20 +280,19 @@ class NestedSet
      * 
      * The columns `left`, `right` must have been built before using this method, otherwise the result will be incorrect.
      * 
-     * @param array $options Available options: filter_taxonomy_id, [search [columns], [search_value]], unlimited, offset, limit
      * @param array $options Available options: <br>
      *                          `filter_taxonomy_id` (int) The filter taxonomy ID.<br>
      *                          `search` (array) The search array format is..<br>
      *                              `array('columns' => array('name', 'column2', 'column3'), 'searchValue' => 'search string')`<br>
      *                          `where` (array) The custom where conditions. The array format is..<br>
-     *                              ``array('whereString' => '(`parent`.`columnName` = :value1 AND `parent`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
+     *                              ``array('whereString' => '(`parent`.`columnName` = :value1 AND `child`.`columnName2` = :value2)', 'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'))``<br>
      *                              or just only `whereString`.<br>
      *                              ``array('whereString' => '(`parent`.`columnName` = \'value\'))``<br>
      *                          `unlimited` (bool) Set to `true` to do not limit the result.<br>
      *                          `offset` (number) The offset in the query.<br>
      *                          `limit` (number) The limit number in the query.<br>
      *                          
-     * @return mixed Return array object of taxonomy data if found, return null if not found.
+     * @return mixed Return array object of taxonomy data if found, return `null` if not found.
      */
     public function getTaxonomyWithChildren(array $options = [])
     {
@@ -905,39 +965,20 @@ class NestedSet
 
 
     /**
-     * Reformat data from tree to be flatten.
-     * @todo remove if not use.
-     * @deprecated since v.0.1
-     * @param array $items The result get from db via listTaxonomy() method that were called via listTaxonomyFlatten() method.
-     * @param integer $flat_count Flat key number count.
-     * @return array Return formatted flatten from tree data.
+     * Restore the columns name to its default property's value.
+     *
+     * @since 1.0
+     * @return void
      */
-    protected function reformatDataFlatten($items, &$flat_count)
+    public function restoreColumnsName()
     {
-        if (!is_array($items) && !is_object($items)) {
-            return $items;
-        }
-
-        foreach ($items as $row) {
-            $output[$flat_count] = new \stdClass();
-
-            foreach ($row as $key => $val) {
-                if ($key != 'children') {
-                    $output[$flat_count]->$key = $val;
-                }
-            }// endforeach;
-            unset($key, $val);
-
-            $flat_count++;
-
-            if (isset($row->children)) {
-                $output = array_merge($output, $this->reformatDataFlatten($row->children, $flat_count));
-            }
-        }// endforeach;
-
-        unset($row);
-        return $output;
-    }// reformatDataFlatten
+        $this->idColumnName = 'id';
+        $this->parentIdColumnName = 'parent_id';
+        $this->leftColumnName = 'left';
+        $this->rightColumnName = 'right';
+        $this->levelColumnName = 'level';
+        $this->positionColumnName = 'position';
+    }// restoreColumnsName
 
 
 }

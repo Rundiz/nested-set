@@ -133,6 +133,18 @@ class ReadDataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(count($result), count($resultNames));
         unset($result, $resultNames);
 
+        // test filter taxonomy id with options.
+        $options = [];
+        $options['filter_taxonomy_id'] = 16;
+        $options['unlimited'] = true;
+        $result = $this->NestedSet->getTaxonomyWithChildren($options);
+        unset($options);
+        $resultNames = $this->getNamesAsArray($result);
+        $this->assertCount(4, $result);
+        $this->assertArraySubset(['3.2', '3.2.1', '3.2.2', '3.2.3'], $resultNames);
+        $this->assertEquals(count($result), count($resultNames));
+        unset($result, $resultNames);
+
         // tests on `test_taxonomy2` table. ----------------------------------------------
         $this->NestedSet->tableName = 'test_taxonomy2';
         $this->NestedSet->idColumnName = 'tid';
@@ -144,7 +156,7 @@ class ReadDataTest extends \PHPUnit\Framework\TestCase
         $options = [];
         $options['filter_taxonomy_id'] = 4;
         $options['where'] = [
-            'whereString' => '`parent`.`t_type` = :t_type',
+            'whereString' => '`child`.`t_type` = :t_type',
             'whereValues' => [':t_type' => 'category'],
         ];
         $result = $this->NestedSet->getTaxonomyWithChildren($options);

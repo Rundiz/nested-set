@@ -428,7 +428,7 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
 
 
     /**
-     * Test `rebuild()` method. This method must run after `INSERT` or `UPDATE` the database.<br>
+     * Test `rebuild()` method. This method must run after `INSERT`, `UPDATE`, or `DELETE` the data in database.<br>
      * It may have to run if the `level`, `left`, `right` data is incorrect.
      *
      * @return void

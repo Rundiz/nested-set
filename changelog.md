@@ -50,3 +50,6 @@
 * The option keys in the argument of `listTaxonomyFlatten()` method was added.<br>
     `['where']['whereString']`<br>
     `['where']['whereValues']`
+
+#### New method
+* `restoreColumnsName()`.

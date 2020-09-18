@@ -19,6 +19,7 @@
             <file>./tests/phpunit/ListingDataTest.php</file>
             <file>./tests/phpunit/ReadDataTest.php</file>
             <file>./tests/phpunit/UpdateDataTest.php</file>
+            <file>./tests/phpunit/DeleteDataTest.php</file>
 		</testsuite>
 	</testsuites>
 	<filter>
