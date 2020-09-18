@@ -46,4 +46,6 @@
 # Export ignore folders, files.
 tests export-ignore
 .gitattributes export-ignore
+.wiki export-ignore
+phpdocs.xml export-ignore
 phpunit.xml export-ignore

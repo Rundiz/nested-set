@@ -233,8 +233,7 @@ class NestedSet
      *     'whereValues' => array(':value1' => 'lookup value 1', ':value2' => 'lookup value2'),
      * )</pre>
      * @return int Return the new position in the same parent.<br>
-     *              WARNING! If there are no results, either because there are no data <br>
-     *              or the results according to the conditions cannot be found. It always returns 1.
+     *              WARNING! If there are no results or the results according to the conditions cannot be found. It always returns 1.
      */
     public function getNewPosition(int $parent_id, array $where = []): int
     {

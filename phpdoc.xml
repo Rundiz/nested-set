@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor>
+  <title><![CDATA[NestedSet]]></title>
+  <parser>
+    <target>.phpdoc/cache</target>
+  </parser>
+  <transformer>
+    <target>.wiki/apidoc</target>
+  </transformer>
+  <files>
+    <directory>.</directory>
+    <ignore>.*/*</ignore>
+    <ignore>tests/*</ignore>
+  </files>
+</phpdocumentor>
