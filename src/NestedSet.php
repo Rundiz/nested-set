@@ -12,6 +12,8 @@ namespace Rundiz\NestedSet;
 /**
  * Nested Set class for build left, right, level data.
  *
+ * @link http://mikehillyer.com/articles/managing-hierarchical-data-in-mysql/ Query references. 
+ * @link https://explainextended.com/2009/09/29/adjacency-list-vs-nested-sets-mysql/ Query references.
  * @author Vee W.
  */
 class NestedSet
