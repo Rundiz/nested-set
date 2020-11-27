@@ -4,7 +4,7 @@
  */
 
 
-namespace Rundiz\NestedSet\Tests;
+namespace Rundiz\NestedSet\Tests\PHP71;
 
 
 class UpdateDataTest extends \PHPUnit\Framework\TestCase
@@ -23,14 +23,14 @@ class UpdateDataTest extends \PHPUnit\Framework\TestCase
     protected $NestedSet;
 
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->PDO = require dirname(__DIR__) . '/common/pdo-connect.php';
-        $this->NestedSet = new NestedSetExtends($this->PDO);
+        $this->PDO = require dirname(__DIR__, 2) . '/common/pdo-connect.php';
+        $this->NestedSet = new \Rundiz\NestedSet\Tests\NestedSetExtends($this->PDO);
     }
 
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->PDO = null;
         $this->NestedSet = null;

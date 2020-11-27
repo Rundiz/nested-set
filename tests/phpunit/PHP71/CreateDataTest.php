@@ -4,7 +4,7 @@
  */
 
 
-namespace Rundiz\NestedSet\Tests;
+namespace Rundiz\NestedSet\Tests\PHP71;
 
 
 class CreateDataTest extends \PHPUnit\Framework\TestCase
@@ -23,14 +23,14 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
     protected $NestedSet;
 
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->PDO = require dirname(__DIR__) . '/common/pdo-connect.php';
-        $this->NestedSet = new NestedSetExtends($this->PDO);
+        $this->PDO = require dirname(__DIR__, 2) . '/common/pdo-connect.php';
+        $this->NestedSet = new \Rundiz\NestedSet\Tests\NestedSetExtends($this->PDO);
     }
 
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->PDO = null;
         $this->NestedSet = null;
@@ -44,7 +44,7 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
      */
     public function testImportDemoData()
     {
-        if (!file_exists(dirname(__DIR__) . '/common/demo-data.sql')) {
+        if (!file_exists(dirname(__DIR__, 2) . '/common/demo-data.sql')) {
             throw new \Exception('demo sql file could not be found. (common/demo-data.sql)');
         }
 
@@ -55,7 +55,7 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
         $this->PDO->exec($sql);
         unset($sql);
 
-        $sqlFileContents = file_get_contents(dirname(__DIR__) . '/common/demo-data.sql');
+        $sqlFileContents = file_get_contents(dirname(__DIR__, 2) . '/common/demo-data.sql');
         $expSql = explode(';', $sqlFileContents);
         unset($sqlFileContents);
         $this->assertTrue(is_array($expSql));
@@ -240,7 +240,7 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
                 'children' => [],
             ],
         ];
-        $this->assertArraySubset($assert, $array);
+        $this->assertEquals($assert, $array);
     }// testGetTreeRebuildChildren
 
 
@@ -423,7 +423,7 @@ class CreateDataTest extends \PHPUnit\Framework\TestCase
                 'right' => 10,
             ],
         ];
-        $this->assertArraySubset($assert, $array);
+        $this->assertEquals($assert, $array);
     }// testRebuildGenerateTreeData
 
 

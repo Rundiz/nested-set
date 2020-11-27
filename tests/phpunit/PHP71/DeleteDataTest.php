@@ -4,7 +4,7 @@
  */
 
 
-namespace Rundiz\NestedSet\Tests;
+namespace Rundiz\NestedSet\Tests\PHP71;
 
 
 class DeleteDataTest extends \PHPUnit\Framework\TestCase
@@ -23,12 +23,12 @@ class DeleteDataTest extends \PHPUnit\Framework\TestCase
     protected $NestedSet;
 
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->PDO = require dirname(__DIR__) . '/common/pdo-connect.php';
-        $this->NestedSet = new NestedSetExtends($this->PDO);
+        $this->PDO = require dirname(__DIR__, 2) . '/common/pdo-connect.php';
+        $this->NestedSet = new \Rundiz\NestedSet\Tests\NestedSetExtends($this->PDO);
 
-        if (!file_exists(dirname(__DIR__) . '/common/demo-data.sql')) {
+        if (!file_exists(dirname(__DIR__, 2) . '/common/demo-data.sql')) {
             throw new \Exception('demo sql file could not be found. (common/demo-data.sql)');
         }
 
@@ -39,7 +39,7 @@ class DeleteDataTest extends \PHPUnit\Framework\TestCase
         $this->PDO->exec($sql);
         unset($sql);
 
-        $sqlFileContents = file_get_contents(dirname(__DIR__) . '/common/demo-data.sql');
+        $sqlFileContents = file_get_contents(dirname(__DIR__, 2) . '/common/demo-data.sql');
         $expSql = explode(';', $sqlFileContents);
         unset($sqlFileContents);
         if (is_array($expSql)) {
@@ -70,7 +70,7 @@ class DeleteDataTest extends \PHPUnit\Framework\TestCase
     }// setUp
 
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->PDO = null;
         $this->NestedSet = null;
@@ -93,7 +93,7 @@ class DeleteDataTest extends \PHPUnit\Framework\TestCase
         unset($options);
         $resultNames = $this->getNamesAsArray($result);
         $this->assertCount(4, $result);
-        $this->assertArraySubset(['3.2', '3.2.1', '3.2.2', '3.2.3'], $resultNames);
+        $this->assertTrue(empty(array_diff(['3.2', '3.2.1', '3.2.2', '3.2.3'], $resultNames)));
         $this->assertEquals(count($result), count($resultNames));
         unset($result, $resultNames);
 
@@ -142,7 +142,7 @@ class DeleteDataTest extends \PHPUnit\Framework\TestCase
         $resultAfterDelete = $this->NestedSet->listTaxonomyFlatten($options);
         $resultTargetAfterDelete = $this->NestedSet->getTaxonomyWithChildren($getWithChildrenOptions);
         unset($getWithChildrenOptions, $options);
-        $this->assertArraySubset(['3.2', '3.2.1', '3.2.2', '3.2.3'], $resultTargetBeforeDelete);
+        $this->assertTrue(empty(array_diff(['3.2', '3.2.1', '3.2.2', '3.2.3'], $resultTargetBeforeDelete)));
         $this->assertCount(32, $resultBeforeDelete['items']);
         $this->assertSame(4, $deleteResult);
         $this->assertNull($resultTargetAfterDelete);

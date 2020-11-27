@@ -15,16 +15,20 @@
             <!-- have to add each test file here and run with the command `phpunit - -testsuit All` (no space between double dash). -->
             <file>./tests/phpunit/PhpVersionTest.php</file>
             <file>./tests/phpunit/DBTest.php</file>
-            <file>./tests/phpunit/CreateDataTest.php</file>
-            <file>./tests/phpunit/ListingDataTest.php</file>
-            <file>./tests/phpunit/ReadDataTest.php</file>
-            <file>./tests/phpunit/UpdateDataTest.php</file>
-            <file>./tests/phpunit/DeleteDataTest.php</file>
+            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/CreateDataTest.php</file>
+            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/CreateDataTest.php</file>
+
+            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/ListingDataTest.php</file>
+            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/ListingDataTest.php</file>
+
+            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/ReadDataTest.php</file>
+            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/ReadDataTest.php</file>
+
+            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/UpdateDataTest.php</file>
+            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/UpdateDataTest.php</file>
+
+            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/DeleteDataTest.php</file>
+            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/DeleteDataTest.php</file>
 		</testsuite>
 	</testsuites>
-	<filter>
-		<whitelist>
-			<directory suffix=".php">./src/</directory>
-		</whitelist>
-	</filter>
 </phpunit>

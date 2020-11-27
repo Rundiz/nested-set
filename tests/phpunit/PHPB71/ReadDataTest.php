@@ -4,7 +4,7 @@
  */
 
 
-namespace Rundiz\NestedSet\Tests;
+namespace Rundiz\NestedSet\Tests\PHPB71;
 
 
 class ReadDataTest extends \PHPUnit\Framework\TestCase
@@ -25,8 +25,8 @@ class ReadDataTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $this->PDO = require dirname(__DIR__) . '/common/pdo-connect.php';
-        $this->NestedSet = new NestedSetExtends($this->PDO);
+        $this->PDO = require dirname(dirname(__DIR__)) . '/common/pdo-connect.php';
+        $this->NestedSet = new \Rundiz\NestedSet\Tests\NestedSetExtends($this->PDO);
     }
 
 
