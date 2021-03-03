@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Nested Set
- * @version 1.0.1
+ * @version 1.0.2
  * @author Vee W.
  * @license http://opensource.org/licenses/MIT MIT
  */
@@ -817,6 +817,9 @@ class NestedSet
             }// endforeach;
 
             $result = ($items[0] ?? array_shift($items));// this is important ([0]) for prevent duplicate items
+            if (is_null($result) || !is_array($result)) {
+                return [];
+            }
         }
 
         unset($items, $row);

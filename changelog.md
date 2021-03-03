@@ -1,5 +1,10 @@
 ## v1.x
 
+### v1.0.2
+2021-03-03
+
+* Fix `listTaxonomyBuildTreeWithChildren()` did not return array.
+
 ### v1.0.0
 2020-09-15
 
