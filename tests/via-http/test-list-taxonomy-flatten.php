@@ -36,6 +36,15 @@ if (isset($list_txn) && is_array($list_txn) && array_key_exists('total', $list_t
     $total_pages = 0;
 }
 unset($options);
+
+$filter_parent_id = filter_input(INPUT_GET, 'filter_parent_id', FILTER_SANITIZE_NUMBER_INT);
+if (!is_string($filter_parent_id)) {
+    $filter_parent_id = '';
+}
+$searchFormValue = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_SPECIAL_CHARS);
+if (!is_string($searchFormValue)) {
+    $searchFormValue = '';
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -92,7 +101,7 @@ unset($options);
                     ?> 
                 </select>
                 Search:
-                <input type="search" name="search" value="<?php echo filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING); ?>">
+                <input type="search" name="search" value="<?php echo $searchFormValue; ?>">
                 <button type="submit">Submit</button>
                 <a href="test-list-taxonomy-flatten.php">Reset filter</a>
                 <?php
@@ -151,7 +160,7 @@ unset($options);
         </table>
         <?php 
         echo 'pagination: ';
-        echo '<a href="?filter_parent_id=' . urlencode(filter_input(INPUT_GET, 'filter_parent_id', FILTER_SANITIZE_NUMBER_INT)) . '&amp;search=' . urlencode(filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING)) . '&amp;page=';
+        echo '<a href="?filter_parent_id=' . urlencode($filter_parent_id) . '&amp;search=' . urlencode($searchFormValue) . '&amp;page=';
         if ($pagination_page == null || $pagination_page <= 1) {
             echo '" disabled="disabled" onclick="return false;"';
         } else {
@@ -159,7 +168,7 @@ unset($options);
         }
         echo '>&lt;</a>';
         echo ' ';
-        echo '<a href="?filter_parent_id=' . urlencode(filter_input(INPUT_GET, 'filter_parent_id', FILTER_SANITIZE_NUMBER_INT)) . '&amp;search=' . urlencode(filter_input(INPUT_GET, 'search', FILTER_SANITIZE_STRING)) . '&amp;page=';
+        echo '<a href="?filter_parent_id=' . urlencode($filter_parent_id) . '&amp;search=' . urlencode($searchFormValue) . '&amp;page=';
         if ($pagination_page >= $total_pages) {
             echo '" disabled="disabled" onclick="return false;"';
         } else {
