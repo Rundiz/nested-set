@@ -1,0 +1,62 @@
+/*
+@license http://opensource.org/licenses/MIT MIT
+*/
+
+
+pre {
+    background: #eee;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    padding: 10px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+
+table {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    width: 100%;
+}
+table td,
+table th {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+table .column-checkbox {
+    text-align: center;
+    width: 30px;
+}
+table .column-id {
+    width: 40px;
+}
+
+
+.form-alert {
+    margin-bottom: 20px;
+}
+.form-alert.error {
+    color: red;
+}
+
+
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: inline-block;
+    margin-right: 10px;
+    width: 70px;
+}
+.form-group .description {
+    color: #555;
+    font-size: small;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
