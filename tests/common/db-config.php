@@ -13,6 +13,7 @@ $db['password'] = 'pass';
 $db['options'] = [
     \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION, // throws PDOException.
     \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_OBJ,
+    \PDO::ATTR_STRINGIFY_FETCHES => true,// fix PHP 8.1+ that number (string type) will becomes int.
 ];
 
 
