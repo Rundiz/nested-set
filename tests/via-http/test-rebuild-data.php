@@ -20,7 +20,7 @@ $Sth->execute();
 $row = $Sth->fetch();
 $Sth->closeCursor();
 unset($sql, $Sth);
-if ($row != null && $row->{$NestedSet->rightColumnName} == '40') {
+if ($row != null && $row->{$NestedSet->rightColumnName} == '62') {
     echo 'Re-build correctly!';
 } else {
     echo 'Re-build incorrect!';
