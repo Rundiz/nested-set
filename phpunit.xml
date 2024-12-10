@@ -1,34 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         bootstrap="./tests/phpunit/phpunit.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         verbose="true"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd" 
+        backupGlobals="false" 
+        backupStaticProperties="false"
+        bootstrap="./tests/phpunit/phpunit.php" 
+        cacheDirectory=".phpunit.cache" 
+        colors="true" 
+        processIsolation="false" 
+        stopOnFailure="false" 
 >
-	<testsuites>
-		<testsuite name="All">
-            <!-- have to add each test file here and run with the command `phpunit - -testsuit All` (no space between double dash). -->
+    <testsuites>
+        <testsuite name="All">
+            <!-- have to add each test file here and run with the command `phpunit - -testsuit All` (no space between double dash) to make it test by order otherwise the db test may failed. -->
             <file>./tests/phpunit/PhpVersionTest.php</file>
             <file>./tests/phpunit/DBTest.php</file>
-            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/CreateDataTest.php</file>
-            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/CreateDataTest.php</file>
-
-            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/ListingDataTest.php</file>
-            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/ListingDataTest.php</file>
-
-            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/ReadDataTest.php</file>
-            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/ReadDataTest.php</file>
-
-            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/UpdateDataTest.php</file>
-            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/UpdateDataTest.php</file>
-
-            <file phpVersion="7.1" phpVersionOperator="&lt;">./tests/phpunit/PHPB71/DeleteDataTest.php</file>
-            <file phpVersion="7.1" phpVersionOperator=">=">./tests/phpunit/PHP71/DeleteDataTest.php</file>
-		</testsuite>
-	</testsuites>
+            <file>./tests/phpunit/PHP84/CreateDataTest.php</file>
+            <file>./tests/phpunit/PHP84/ListingDataTest.php</file>
+            <file>./tests/phpunit/PHP84/ReadDataTest.php</file>
+            <file>./tests/phpunit/PHP84/UpdateDataTest.php</file>
+            <file>./tests/phpunit/PHP84/DeleteDataTest.php</file>
+        </testsuite>
+    </testsuites>
 </phpunit>

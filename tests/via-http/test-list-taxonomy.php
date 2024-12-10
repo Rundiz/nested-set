@@ -19,8 +19,11 @@ unset($options);
  * @param boolean $first Leave this for correctly render ul class.
  * @return string Return rendered nested ul.
  */
-function renderTaxonomyTree(array $array, \Rundiz\NestedSet\NestedSet $NestedSet = null, $first = true)
+function renderTaxonomyTree(array $array, $NestedSet = null, $first = true)
 {
+    if (!is_null($NestedSet) && !$NestedSet instanceof \Rundiz\NestedSet\NestedSet) {
+        throw new \InvalidArgumentException('The argument `$NestedSet` must be null or instance of `\Rundiz\NestedSet\NestedSet`.');
+    }
     if (!is_array($array)) {
         return '';
     }

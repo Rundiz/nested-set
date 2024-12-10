@@ -3,6 +3,10 @@
 
 namespace Rundiz\NestedSet\Tests;
 
+
+use PHPUnit\Framework\Attributes\Depends;
+
+
 class DBTest extends \PHPUnit\Framework\TestCase
 {
 
@@ -25,9 +29,8 @@ class DBTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test that the tables (DB structure) are created or imported correctly.
-     * 
-     * @depends testDbConfig
      */
+    #[Depends('testDbConfig')]
     public function testTablesInstalled(\PDO $PDO)
     {
         $sql = 'SHOW TABLES LIKE \'test_taxonomy\'';

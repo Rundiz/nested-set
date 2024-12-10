@@ -10,6 +10,8 @@ The PHP nested set model for create/read/update/delete the tree data structure (
 
 A class that help you to query complex data of nested set.
 
+Tested up to PHP 8.4.
+
 ## Example
 
 ### Install

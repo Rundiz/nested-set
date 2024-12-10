@@ -1,2 +1,3 @@
 .phpdoc
 .phpunit.result.cache
+.phpunit.cache
