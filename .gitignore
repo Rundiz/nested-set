@@ -1,3 +1,4 @@
 /.phpdoc/
 /.phpunit.cache
 .phpunit.result.cache
+/.wiki/
